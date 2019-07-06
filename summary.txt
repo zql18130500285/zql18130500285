@@ -1,0 +1,205 @@
+国际双创实践周 - 开源硬件实战
+——计算机科学与技术学院 张千磊 18130500285
+
+一. 国际双创实践周参与情况
+
+第一天
+
+介绍了 
+Arduino 硬件, 创客思想
+Arduino IDE, Processing , fritzing
+Github
+
+
+作业:
+
+安装三个软件
+
+注册GitHub 建立仓库用于提交编程作业
+
+第二天
+
+讲解了Arduino 基础编程, 串口编程
+
+作业:
+
+在Arduino上完成, 从电脑串口接收一串字符, 使用LED 发送对应的Morse码
+
+第三天
+
+介绍了Arduino仿真网站 Tinkercad
+
+讲解了
+电机的使用, PWM技术
+7段数码管编程, CD4511使用
+
+作业:
+
+在Arduino上完成
+
+给课堂例子增加转向灯功能
+
+通过串口输入数字, 在数码管显示
+
+
+
+```c++
+char num;
+
+void setup(){
+    Serial.begin(9600);
+  	for(char i = 2; i < 6; i++)
+      pinMode(i, OUTPUT);
+}
+
+void loop(){
+	while(Serial.available() > 0){
+      num = Serial.read() ;
+      if(isDigit(num)){
+        num -= '0';
+      	for(char i = 0; i < 4; i++)
+          digitalWrite(i + 2, (num>>i) & 1u);
+      }
+    }
+    delay(10);
+}
+```
+
+第四天
+
+以仿真方式完善第一天内容
+
+答疑环节
+
+交流和总结
+
+作业:
+
+撰写总结报告
+
+完善Github仓库格式
+
+
+```c++
+#define DEBUG
+
+class MorseBase {
+  int _pin;
+  const int clk = 250;
+
+public:
+  MorseBase(int8_t pin) : _pin(pin) { pinMode(pin, OUTPUT); }
+  inline void dit() {
+    digitalWrite(_pin, HIGH);
+    delay(clk);
+    digitalWrite(_pin, LOW);
+    delay(clk);
+#ifdef DEBUG
+    Serial.print('.');
+#endif
+  }
+  inline void dah() {
+    digitalWrite(_pin, HIGH);
+    delay(clk * 3);
+    digitalWrite(_pin, LOW);
+    delay(clk);
+#ifdef DEBUG
+    Serial.print('-');
+#endif
+  }
+  inline void eoc() {
+    delay(clk << 1);
+#ifdef DEBUG
+    Serial.print(' ');
+#endif
+  }
+  inline void eow() {
+    delay((clk << 2) + (clk << 1));
+#ifdef DEBUG
+    Serial.print("/");
+#endif
+  }
+};
+
+MorseBase x(13);
+
+bool isInitial = true;
+char ch = 0;
+
+void setup() { Serial.begin(9600); }
+
+void loop() {
+  if (Serial.available() > 0) {
+    ch = Serial.read();
+    if (isUpperCase(ch))
+      ch |= 0x20u;
+    if (isInitial)
+      isInitial = false;
+    else if (ch != ' ')
+      x.eoc();
+    else {
+      isInitial = true;
+      x.eow();
+    }
+    switch (ch) {
+      case 'a': x.dit(); x.dah(); break;
+      case 'b': x.dah(); x.dit(); x.dit(); x.dit(); break;
+      case 'c': x.dah(); x.dit(); x.dah(); x.dit(); break;
+      case 'd': x.dah(); x.dit(); x.dit(); break;
+      case 'e': x.dit(); break;
+      case 'f': x.dit(); x.dit(); x.dah(); x.dit(); break;
+      case 'g': x.dah(); x.dah(); x.dit(); break;
+      case 'h': x.dit(); x.dit(); x.dit(); x.dit(); break;
+      case 'i': x.dit(); x.dit(); break;
+      case 'j': x.dit(); x.dah(); x.dah(); x.dah(); break;
+      case 'k': x.dah(); x.dit(); x.dah(); break;
+      case 'l': x.dit(); x.dah(); x.dit(); x.dit(); break;
+      case 'm': x.dah(); x.dah(); break;
+      case 'n': x.dah(); x.dit(); break;
+      case 'o': x.dah(); x.dah(); x.dah(); break;
+      case 'p': x.dit(); x.dah(); x.dah(); x.dit(); break;
+      case 'q': x.dah(); x.dah(); x.dit(); x.dah(); break;
+      case 'r': x.dit(); x.dah(); x.dit(); break;
+      case 's': x.dit(); x.dit(); x.dit(); x.dit(); break;
+      case 't': x.dah(); break;
+      case 'u': x.dit(); x.dit(); x.dah(); break;
+      case 'v': x.dit(); x.dit(); x.dit(); x.dah(); break;
+      case 'w': x.dit(); x.dah(); x.dah(); break;
+      case 'x': x.dah(); x.dit(); x.dit(); x.dah(); break;
+      case 'y': x.dah(); x.dit(); x.dah(); x.dah(); break;
+      case 'z': x.dah(); x.dah(); x.dit(); x.dit(); break;
+      case '0': x.dah(); x.dah(); x.dah(); x.dah(); x.dah(); break;
+      case '1': x.dit(); x.dah(); x.dah(); x.dah(); x.dah(); break;
+      case '2': x.dit(); x.dit(); x.dah(); x.dah(); x.dah(); break;
+      case '3': x.dit(); x.dit(); x.dit(); x.dah(); x.dah(); break;
+      case '4': x.dit(); x.dit(); x.dit(); x.dit(); x.dah(); break;
+      case '5': x.dit(); x.dit(); x.dit(); x.dit(); x.dit(); break;
+      case '6': x.dah(); x.dit(); x.dit(); x.dit(); x.dit(); break;
+      case '7': x.dah(); x.dah(); x.dit(); x.dit(); x.dit(); break;
+      case '8': x.dah(); x.dah(); x.dah(); x.dit(); x.dit(); break;
+      case '9': x.dah(); x.dah(); x.dah(); x.dah(); x.dit(); break;
+      case ',': x.dah(); x.dah(); x.dit(); x.dit(); x.dah(); x.dah(); break;
+      case '.': x.dit(); x.dah(); x.dit(); x.dah(); x.dit(); x.dah(); break;
+      case '?': x.dit(); x.dit(); x.dah(); x.dah(); x.dit(); x.dit(); break;
+      case '!': x.dit(); x.dit(); x.dah(); x.dah(); x.dit(); break;
+      case '\"': x.dit(); x.dah(); x.dit(); x.dit(); x.dah(); x.dit(); break;
+      case '\'': x.dit(); x.dah(); x.dah(); x.dah(); x.dah(); x.dit(); break;
+      case '-': x.dah(); x.dit(); x.dit();x.dit(); x.dit(); x.dah(); break;
+    }
+  }
+}
+```
+
+二. 国际双创实验周主要收获
+
+学习到了Arduino 的基础入门知识
+
+在老师的指导下完成了多次实验
+
+体会到了 使用Arduino创造的快乐
+
+增加了对开源硬件的兴趣
+
+三. 意见与建议
+
+学校对双创周各项课程的前提标注不明，尤其是对于基础尚且薄弱的大一学生，不利于学生结合自身实际进行课程选择，也不利于老师顺利地推进课程。
