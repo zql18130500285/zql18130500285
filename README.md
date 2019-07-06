@@ -8,10 +8,6 @@
  
  > CAR
  
--· 7.4 转向灯
-
- >Turn signal
- 
 -· 7.4 数码管
 
  > digitron
